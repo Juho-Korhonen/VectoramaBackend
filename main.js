@@ -1,10 +1,10 @@
+import {REF, generateRandomId, getHtml} from './FUNCTIONS.js';
+
 function handleError(error){
     var errorCode = error.code;
     var errorMessage = error.message;
     console.log(errorCode, errorMessage)
 }
-
-
 function validateUserName(fetching=false){// if fetching, return field value, otherwise return if field is valid
     if(fetching){
         return document.getElementById("usernameInput").value
@@ -12,7 +12,10 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
         const userNameInput = document.getElementById("usernameInput");
         if (userNameInput.value.length > 2 && userNameInput.value.length < 15){
             return true
-        } else return false
+        } else {
+            alert("Lisää nimi!")
+            return false
+        }
     }
 
 }
@@ -20,60 +23,134 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
 
 
 (function(){
-    const userNameInput = document.getElementById("userNameInput");
     const createRoomBtn = document.getElementById("createRoomBtn");
     const joinRoomBtn = document.getElementById("joinRoomBtn");
     const joinRoomCode = document.getElementById("roomCodeInput");
+    const gameContainerElement = document.getElementById("gameContainerElement");
 
     var playerId;
     var playerName;
     var roomRef;
+    var roomRefVal;
     var roomId;
-    var players;
 
-
+    var isAdmin;// if user is admin/creator
 
     firebase.auth().onAuthStateChanged(user => {
+
+        function InitWaitingRoom(){
+            roomRef.on("value",snapshot => {// activates when room values change(for updating values and handling disconnects/leaves)
+                roomRefVal = snapshot.val();// resetting roomRefVal on change
+                isAdmin = roomRefVal.adminId == playerId;
+                // setting Disconnect rules.
+                if(isAdmin){
+                    const index = roomRefVal.players.findIndex(player => player.uid == playerId);
+                    var playersList = roomRefVal.players;
+                    playersList.splice(index,1);
+                    if(playersList.length == 0){
+                        roomRef.onDisconnect().remove()
+                    }else{
+                        const randomPlayer = playersList[Math.floor(Math.random()*playersList.length)]
+                        var leftObject = roomRefVal;
+                        leftObject.adminId = randomPlayer.uid;
+                        leftObject.adminName = randomPlayer.username
+                        leftObject.players = playersList;
+                        roomRef.onDisconnect().update(leftObject)
+                    }
+                }else {
+                    const index = roomRefVal.players.findIndex(player => player.uid == playerId);
+                    var leftObject = roomRefVal;
+                    leftObject.players.splice(index,1);
+                    roomRef.onDisconnect().update(leftObject)
+                } 
+
+                if(roomRefVal.gameStarted){// KEHITSYS JATKUU KEHITSYS JATKUU TÄÄLLÄ KEHITSYS JATKUU TÄÄLLÄ KEHITSYS JATKUU TÄÄLLÄ KEHITSYS JATKUU TÄÄLLÄ KEHITSYS JATKUU TÄÄLLÄ
+                    gameContainerElement.innerHTML = getHtml("gameView");
+                }else{
+                    handleWaitingRoomHtml()
+                }
+            })
+            function handleWaitingRoomHtml(){
+                if(isAdmin){
+                    gameContainerElement.innerHTML = getHtml("adminStartView")
+                    document.getElementById("gameId").innerHTML = "Room id: " + roomId;
+                    document.getElementById("numberOfPlayers").innerHTML = "Number of players: " + Number(roomRefVal.players.length+1);
+    
+                    document.getElementById("startButton").addEventListener("click", () => {// if the admin presses to start game
+                        if(roomRefVal.players.length > 0){
+                            gameContainerElement.innerHTML = getHtml("gameView");
+                            roomRef.update({
+                                gameStarted: true
+                            })
+                        } else {
+                            alert("Not enough players currently, need atleast 4 players.")
+                        }
+                    })
+                }else {
+                    gameContainerElement.innerHTML = getHtml("normalStartView");
+                    document.getElementById("gameId").innerHTML = "Room id: " + roomId;
+                    document.getElementById("numberOfPlayers").innerHTML = "Number of players: " + Number(roomRefVal.players.length+1);
+                }
+            }
+            handleWaitingRoomHtml()
+
+
+        }
+        
+
+
         if(user){// auth onnistunut
             playerId = user.uid;
+
             createRoomBtn.addEventListener("click", () => {
-                roomId = Date.now().toString().substring(-6);
-                alert(roomId)
                 if(validateUserName()){
-                    playerName = validateUserName(true);
-                    roomRef = firebase.database().ref("rooms/" + roomId);
+                    playerName = validateUserName(true)
+                    roomId = generateRandomId().toString();
+                    roomRef = REF(roomId);
                     roomRef.set({
-                        players:[{username: playerName, uid: playerId}],
-                        creator:playerName,
-                        roomId: roomId
-                    }).then(() => {
-                        window.location.href = "odotushuone.html";
+                        adminId: playerId,
+                        adminName: playerName,
+                        id: roomId,
+                        players: [{
+                            uid: playerId,
+                            username: playerName
+                        }],
+                        gameStarted: false,
+                        gameStartTime: Date.now()
                     })
-                } else alert("Nimesi täytyy olla pidempi kuin 3 ja lyhyempi kuin 15.")
-                
-            })
-            joinRoomBtn.addEventListener("click", () => {
-                alert(roomId)
-                roomId = joinRoomCode.value;
-                if(validateUserName()){
-                    playerName = validateUserName(true);
-                    try{
-                        roomRef = firebase.database().ref("rooms/" + roomId);
-                        roomRef.update({
-                            players: [{username: playerName, uid: playerId}]
-                        }).then(() => {
-                            window.location.href = "odotushuone.html";
-                        })
-                    }catch(error){
-                        alert("Tarkista koodi, kirjoitithan sen oikein?")
-                    }
-                } else alert("Nimesi täytyy olla pidempi kuin 3 ja lyhyempi kuin 15.")
+                    roomRef.get().then(res => {
+                        roomRefVal = res.val();
+                        InitWaitingRoom();
+                    })
+                    
+                }
             })
 
+            joinRoomBtn.addEventListener("click", async () => {
+                if(validateUserName()){
+                    playerName = validateUserName(true);
+                    roomId = joinRoomCode.value;
+                    roomRef = REF(roomId);
+                    let oldRoomRef = await roomRef.get();
+                    if(oldRoomRef.exists()){
+                        oldRoomRef = oldRoomRef.val();
+
+                        const userInGame = oldRoomRef.players.find(player => player.uid == playerId) !== undefined;
+                        if(!userInGame){
+                            oldRoomRef.players.push({uid: playerId, username: playerName});
+                            roomRef.update(oldRoomRef)
+                        }
+                        roomRef.get().then(res => {
+                            roomRefVal = res.val();
+                            InitWaitingRoom();
+                        })
+                    } else alert("REF doesn't exist")
+
+                }
+            })
         }
     })
     firebase.auth().signInAnonymously().catch(handleError)
-
 
 
 
