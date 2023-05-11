@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body style="background-color: blue;">
+    <div style="flex-direction: column; display: flex; width: 10%; background-color: white; padding: 50px; border-radius: 20px; margin:20px">
+        <button id="petri" onclick="changeBgColor('petri')">Petri</button>
+        <button id="petra" onclick="changeBgColor('petra')">Petra</button>
+        <button id="mauno" onclick="changeBgColor('mauno')">Mauno</button>
+        <button style="background-color: lightgreen; margin: 10px; padding: 5px; border-radius: 10px;">Lähetä</button>
+    </div>
+
+    <script>
+        var pelaajat = ["petri","petra","mauno"];
+        var valittu;
+        function changeBgColor(id){
+            valittu = id;
+            for(var i=0; i<pelaajat.length; i++){
+                document.getElementById(pelaajat[i]).style.backgroundColor = null;
+            }
+            document.getElementById(id).style.backgroundColor = "lightblue";
+        };
+
+
+
+
+    </script>
+</body>
+</html>
+

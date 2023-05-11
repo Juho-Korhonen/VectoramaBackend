@@ -1,5 +1,5 @@
 import {REF, generateRandomId, getHtml} from './FUNCTIONS.js';
-
+import {getData, handleAiData} from './FIRESTOREFUNCTIONS.js';
 function handleError(error){
     var errorCode = error.code;
     var errorMessage = error.message;
@@ -32,14 +32,20 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
     var roomRef;
     var roomRefVal;
     var roomId;
-    var gameStarted;
-
     var isAdmin;// if user is admin/creator
+    var thirtySecondsInTS = 30000;// 30 seconds in time stamp
 
     firebase.auth().onAuthStateChanged(user => {
-
         function InitWaitingRoom(){
-            if (!gameStarted){
+                roomRef.on("child_added",snapshot => {
+                    roomRefVal = snapshot.val()
+                })
+                roomRef.on("child_changed", snapshot => {
+                    roomRefVal = snapshot.val()
+                })
+                roomRef.on("child_removed",snapshot => {
+                    roomRefVal = snapshot.val()
+                })
                 roomRef.on("value",snapshot => {// activates when room values change(for updating values and handling disconnects/leaves)
                     roomRefVal = snapshot.val();// resetting roomRefVal on change
                     isAdmin = roomRefVal.adminId == playerId;
@@ -67,6 +73,38 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
 
                     if(roomRefVal.gameStarted){// KEHITSYS JATKUU KEHITSYS JATKUU TÄÄLLÄ KEHITSYS JATKUU TÄÄLLÄ KEHITSYS JATKUU TÄÄLLÄ KEHITSYS JATKUU TÄÄLLÄ KEHITSYS JATKUU TÄÄLLÄ
                         gameContainerElement.innerHTML = getHtml("gameView");
+
+                        if(roomRefVal.AIs[0] == "empty"){// if there is no AIs, we add the right amount of them
+                            var numberOfAisWanted = Math.round((roomRefVal.players.length/4)-0.5)
+                            handleAiData(numberOfAisWanted == 0 ? 1 : numberOfAisWanted).then(aiData => {
+                                roomRef.update({AIs: aiData})
+                            })
+                        }
+
+                        if(roomRefVal.timerEndTime == "unset"){// if timer hasnt been set, set it
+                            roomRef.update({timerEndTime: Date.now() + thirtySecondsInTS})
+                        }
+
+                        setInterval(() => {// timer function
+                            console.log(roomRefVal)
+                            if(roomRefVal.timerSetting == 'voting'){
+                                if(roomRefVal.timerEndTime < Date.now()){
+                                    roomRef.update({
+                                        timerSetting: "answering",
+                                        timerEndTime: Date.now()+thirtySecondsInTS/6
+                                    })
+                                }
+                            } else{
+                                if(roomRefVal.timerEndTime < Date.now()){
+                                    for(var i=0; i<roomRefVal.players.length; i++){
+                                        roomRefVal.players[i].points = 0;
+                                    }
+                                    roomRefVal.timerSetting = "voting"
+                                    roomRefVal.timerEndTime = Date.now()+thirtySecondsInTS/6;
+                                    roomRef.update(roomRefVal)
+                                }
+                            }
+                        },3000)
                     }else{
                         handleWaitingRoomHtml()
                     }
@@ -75,10 +113,9 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                     if(isAdmin){
                         gameContainerElement.innerHTML = getHtml("adminStartView")
                         document.getElementById("gameId").innerHTML = "Room id: " + roomId;
-                        document.getElementById("numberOfPlayers").innerHTML = "Number of players: " + Number(roomRefVal.players.length+1);
-        
+                        document.getElementById("numberOfPlayers").innerHTML = "Number of players: " + Number(roomRefVal.players.length+1)
                         document.getElementById("startButton").addEventListener("click", () => {// if the admin presses to start game
-                            if(roomRefVal.players.length > 3){
+                            if(roomRefVal.players.length > -3){
                                 gameContainerElement.innerHTML = getHtml("gameView");
                                 roomRef.update({
                                     gameStarted: true
@@ -94,12 +131,6 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                     }
                 }
                 handleWaitingRoomHtml()
-            }else{// if game is started
-
-
-
-
-            }
         }
         
 
@@ -112,22 +143,27 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                     playerName = validateUserName(true)
                     roomId = generateRandomId().toString();
                     roomRef = REF(roomId);
+                    console.log("Setting")
                     roomRef.set({
+                        duplicateQuestions: ["empty"], 
+                        AIs: ["empty"], // jos laittaa tyhjän arrayn, firebase ei ota sitä vastaan.
                         adminId: playerId,
                         adminName: playerName,
                         id: roomId,
                         players: [{
                             uid: playerId,
-                            username: playerName
+                            username: playerName,
+                            points: 10
                         }],
                         gameStarted: false,
-                        gameStartTime: Date.now()
+                        gameStartTime: Date.now(),
+                        timerSetting: 'answering',
+                        timerEndTime: "unset"
                     })
                     roomRef.get().then(res => {
                         roomRefVal = res.val();
                         InitWaitingRoom();
                     })
-                    
                 }
             })
 
@@ -142,7 +178,11 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
 
                         const userInGame = oldRoomRef.players.find(player => player.uid == playerId) !== undefined;
                         if(!userInGame){
-                            oldRoomRef.players.push({uid: playerId, username: playerName});
+                            oldRoomRef.players.push({
+                                uid: playerId, 
+                                username: playerName,
+                                points: 0
+                            });
                             roomRef.update(oldRoomRef)
                         }
                         roomRef.get().then(res => {
