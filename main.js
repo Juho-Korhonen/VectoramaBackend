@@ -17,7 +17,6 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
             return false
         }
     }
-
 }
 
 
@@ -33,68 +32,74 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
     var roomRef;
     var roomRefVal;
     var roomId;
+    var gameStarted;
 
     var isAdmin;// if user is admin/creator
 
     firebase.auth().onAuthStateChanged(user => {
 
         function InitWaitingRoom(){
-            roomRef.on("value",snapshot => {// activates when room values change(for updating values and handling disconnects/leaves)
-                roomRefVal = snapshot.val();// resetting roomRefVal on change
-                isAdmin = roomRefVal.adminId == playerId;
-                // setting Disconnect rules.
-                if(isAdmin){
-                    const index = roomRefVal.players.findIndex(player => player.uid == playerId);
-                    var playersList = roomRefVal.players;
-                    playersList.splice(index,1);
-                    if(playersList.length == 0){
-                        roomRef.onDisconnect().remove()
-                    }else{
-                        const randomPlayer = playersList[Math.floor(Math.random()*playersList.length)]
-                        var leftObject = roomRefVal;
-                        leftObject.adminId = randomPlayer.uid;
-                        leftObject.adminName = randomPlayer.username
-                        leftObject.players = playersList;
-                        roomRef.onDisconnect().update(leftObject)
-                    }
-                }else {
-                    const index = roomRefVal.players.findIndex(player => player.uid == playerId);
-                    var leftObject = roomRefVal;
-                    leftObject.players.splice(index,1);
-                    roomRef.onDisconnect().update(leftObject)
-                } 
-
-                if(roomRefVal.gameStarted){// KEHITSYS JATKUU KEHITSYS JATKUU TÄÄLLÄ KEHITSYS JATKUU TÄÄLLÄ KEHITSYS JATKUU TÄÄLLÄ KEHITSYS JATKUU TÄÄLLÄ KEHITSYS JATKUU TÄÄLLÄ
-                    gameContainerElement.innerHTML = getHtml("gameView");
-                }else{
-                    handleWaitingRoomHtml()
-                }
-            })
-            function handleWaitingRoomHtml(){
-                if(isAdmin){
-                    gameContainerElement.innerHTML = getHtml("adminStartView")
-                    document.getElementById("gameId").innerHTML = "Room id: " + roomId;
-                    document.getElementById("numberOfPlayers").innerHTML = "Number of players: " + Number(roomRefVal.players.length+1);
-    
-                    document.getElementById("startButton").addEventListener("click", () => {// if the admin presses to start game
-                        if(roomRefVal.players.length > 0){
-                            gameContainerElement.innerHTML = getHtml("gameView");
-                            roomRef.update({
-                                gameStarted: true
-                            })
-                        } else {
-                            alert("Not enough players currently, need atleast 4 players.")
+            if (!gameStarted){
+                roomRef.on("value",snapshot => {// activates when room values change(for updating values and handling disconnects/leaves)
+                    roomRefVal = snapshot.val();// resetting roomRefVal on change
+                    isAdmin = roomRefVal.adminId == playerId;
+                    // setting Disconnect rules.
+                    if(isAdmin){
+                        const index = roomRefVal.players.findIndex(player => player.uid == playerId);
+                        var playersList = roomRefVal.players;
+                        playersList.splice(index,1);
+                        if(playersList.length == 0){
+                            roomRef.onDisconnect().remove()
+                        }else{
+                            const randomPlayer = playersList[Math.floor(Math.random()*playersList.length)]
+                            var leftObject = roomRefVal;
+                            leftObject.adminId = randomPlayer.uid;
+                            leftObject.adminName = randomPlayer.username
+                            leftObject.players = playersList;
+                            roomRef.onDisconnect().update(leftObject)
                         }
-                    })
-                }else {
-                    gameContainerElement.innerHTML = getHtml("normalStartView");
-                    document.getElementById("gameId").innerHTML = "Room id: " + roomId;
-                    document.getElementById("numberOfPlayers").innerHTML = "Number of players: " + Number(roomRefVal.players.length+1);
+                    }else {
+                        const index = roomRefVal.players.findIndex(player => player.uid == playerId);
+                        var leftObject = roomRefVal;
+                        leftObject.players.splice(index,1);
+                        roomRef.onDisconnect().update(leftObject)
+                    } 
+
+                    if(roomRefVal.gameStarted){// KEHITSYS JATKUU KEHITSYS JATKUU TÄÄLLÄ KEHITSYS JATKUU TÄÄLLÄ KEHITSYS JATKUU TÄÄLLÄ KEHITSYS JATKUU TÄÄLLÄ KEHITSYS JATKUU TÄÄLLÄ
+                        gameContainerElement.innerHTML = getHtml("gameView");
+                    }else{
+                        handleWaitingRoomHtml()
+                    }
+                })
+                function handleWaitingRoomHtml(){
+                    if(isAdmin){
+                        gameContainerElement.innerHTML = getHtml("adminStartView")
+                        document.getElementById("gameId").innerHTML = "Room id: " + roomId;
+                        document.getElementById("numberOfPlayers").innerHTML = "Number of players: " + Number(roomRefVal.players.length+1);
+        
+                        document.getElementById("startButton").addEventListener("click", () => {// if the admin presses to start game
+                            if(roomRefVal.players.length > 3){
+                                gameContainerElement.innerHTML = getHtml("gameView");
+                                roomRef.update({
+                                    gameStarted: true
+                                })
+                            } else {
+                                alert("Not enough players currently, need atleast 4 players.")
+                            }
+                        })
+                    }else {
+                        gameContainerElement.innerHTML = getHtml("normalStartView");
+                        document.getElementById("gameId").innerHTML = "Room id: " + roomId;
+                        document.getElementById("numberOfPlayers").innerHTML = "Number of players: " + Number(roomRefVal.players.length+1);
+                    }
                 }
+                handleWaitingRoomHtml()
+            }else{// if game is started
+
+
+
+
             }
-            handleWaitingRoomHtml()
-
-
         }
         
 
@@ -151,7 +156,4 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
         }
     })
     firebase.auth().signInAnonymously().catch(handleError)
-
-
-
 }())
