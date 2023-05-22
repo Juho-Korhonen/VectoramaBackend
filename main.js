@@ -115,12 +115,12 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                                             }
                                         }
                                         currentData.timerSetting = "voting";
-                                        currentData.timerEndTime = Date.now() + thirtySecondsInTS / 6;
+                                        currentData.timerEndTime = Date.now() + thirtySecondsInTS;
                                     }
                                 } else {
                                     if (currentData.timerEndTime < Date.now()) {
                                         currentData.timerSetting = "answering";
-                                        currentData.timerEndTime = Date.now() + thirtySecondsInTS / 6;
+                                        currentData.timerEndTime = Date.now() + thirtySecondsInTS;
                                     }
                                 }
                                 return currentData;
