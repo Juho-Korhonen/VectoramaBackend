@@ -37,15 +37,6 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
 
     firebase.auth().onAuthStateChanged(user => {
         function InitWaitingRoom(){
-                roomRef.on("child_added",snapshot => {
-                    roomRefVal = snapshot.val()
-                })
-                roomRef.on("child_changed", snapshot => {
-                    roomRefVal = snapshot.val()
-                })
-                roomRef.on("child_removed",snapshot => {
-                    roomRefVal = snapshot.val()
-                })
                 roomRef.on("value",snapshot => {// activates when room values change(for updating values and handling disconnects/leaves)
                     roomRefVal = snapshot.val();// resetting roomRefVal on change
                     isAdmin = roomRefVal.adminId == playerId;
@@ -96,12 +87,10 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                                 }
                             } else{
                                 if(roomRefVal.timerEndTime < Date.now()){
-                                    for(var i=0; i<roomRefVal.players.length; i++){
-                                        roomRefVal.players[i].points = 0;
-                                    }
-                                    roomRefVal.timerSetting = "voting"
-                                    roomRefVal.timerEndTime = Date.now()+thirtySecondsInTS/6;
-                                    roomRef.update(roomRefVal)
+                                    roomRef.update({
+                                        timerSetting: "voting",
+                                        timerEndTime: Date.now()+thirtySecondsInTS/6
+                                    })
                                 }
                             }
                         },3000)
@@ -153,7 +142,6 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                         players: [{
                             uid: playerId,
                             username: playerName,
-                            points: 10
                         }],
                         gameStarted: false,
                         gameStartTime: Date.now(),
