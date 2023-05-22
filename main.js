@@ -36,29 +36,37 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
     var thirtySecondsInTS = 30000;// 30 seconds in time stamp
 
     firebase.auth().onAuthStateChanged(user => {
-        function InitWaitingRoom(){
-            function handleWaitingRoomHtml(){
-                if(isAdmin){
-                    gameContainerElement.innerHTML = getHtml("adminStartView")
-                    document.getElementById("gameId").innerHTML = "Room id: " + roomId;
-                    document.getElementById("numberOfPlayers").innerHTML = "Number of players: " + Number(roomRefVal.players.length+1)
-                    document.getElementById("startButton").addEventListener("click", () => {// if the admin presses to start game
-                        if(roomRefVal.players.length > -3){
-                            gameContainerElement.innerHTML = getHtml("gameView");
-                            roomRef.update({
-                                gameStarted: true
-                            })
-                        } else {
-                            alert("Not enough players currently, need atleast 4 players.")
-                        }
-                    })
-                }else {
-                    gameContainerElement.innerHTML = getHtml("normalStartView");
-                    document.getElementById("gameId").innerHTML = "Room id: " + roomId;
-                    document.getElementById("numberOfPlayers").innerHTML = "Number of players: " + Number(roomRefVal.players.length+1);
-                }
+
+        function handleWaitingRoomHtml(roomRefVal, isAdmin) {
+            if(isAdmin){
+                gameContainerElement.innerHTML = getHtml("adminStartView")
+                document.getElementById("gameId").innerHTML = "Room id: " + roomId;
+                document.getElementById("numberOfPlayers").innerHTML = "Number of players: " + Number(roomRefVal.players.length+1)
+                document.getElementById("startButton").addEventListener("click", () => {// if the admin presses to start game
+                    if(roomRefVal.players.length > -3){
+                        gameContainerElement.innerHTML = getHtml("gameView");
+                        roomRef.update({
+                            gameStarted: true
+                        })
+                    } else {
+                        alert("Not enough players currently, need atleast 4 players.")
+                    }
+                })
+            } else {
+                gameContainerElement.innerHTML = getHtml("normalStartView");
+                document.getElementById("gameId").innerHTML = "Room id: " + roomId;
+                document.getElementById("numberOfPlayers").innerHTML = "Number of players: " + Number(roomRefVal.players.length+1);
             }
-                roomRef.on("value",snapshot => {// activates when room values change(for updating values and handling disconnects/leaves)
+        }
+
+        function handleRoomUpdate(snapshot) {
+            const roomRefVal = snapshot.val();
+            const isAdmin = roomRefVal.adminId === playerId;
+            handleWaitingRoomHtml(roomRefVal, isAdmin);
+        }
+
+        function InitWaitingRoom() {
+                roomRef.on("value", snapshot => {// activates when room values change(for updating values and handling disconnects/leaves)
                     roomRefVal = snapshot.val();// resetting roomRefVal on change
                     isAdmin = roomRefVal.adminId == playerId;
                     // setting Disconnect rules.
@@ -83,7 +91,7 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                         roomRef.onDisconnect().update(leftObject)
                     } 
 
-                    if(roomRefVal.gameStarted){// KEHITSYS JATKUU KEHITSYS JATKUU TÄÄLLÄ KEHITSYS JATKUU TÄÄLLÄ KEHITSYS JATKUU TÄÄLLÄ KEHITSYS JATKUU TÄÄLLÄ KEHITSYS JATKUU TÄÄLLÄ
+                    if(roomRefVal.gameStarted) {// KEHITSYS JATKUU KEHITSYS JATKUU TÄÄLLÄ KEHITSYS JATKUU TÄÄLLÄ KEHITSYS JATKUU TÄÄLLÄ KEHITSYS JATKUU TÄÄLLÄ KEHITSYS JATKUU TÄÄLLÄ
                         gameContainerElement.innerHTML = getHtml("gameView");
 
                         if(roomRefVal.AIs[0] == "empty"){// if there is no AIs, we add the right amount of them
@@ -97,34 +105,33 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                             roomRef.update({timerEndTime: Date.now() + thirtySecondsInTS})
                         }
 
-                        setInterval(() => {// timer function
-                            console.log(roomRefVal)
-                            if(roomRefVal.timerSetting == 'voting'){
-                                if(roomRefVal.timerEndTime < Date.now()){
-                                    roomRef.update({
-                                        timerSetting: "answering",
-                                        timerEndTime: Date.now()+thirtySecondsInTS/6
-                                    })
-                                }
-                            } else{
-                                if(roomRefVal.timerEndTime < Date.now()){
-                                    for(var i=0; i<roomRefVal.players.length; i++){
-                                        roomRefVal.players[i].points = 0
+                        setInterval(() => { //Timer function
+                            roomRef.transaction(currentData => {
+                                if (currentData && currentData.timerSetting === "voting") {
+                                    if (currentData.timerEndTime < Date.now()) {
+                                        if (currentData.players) {
+                                            for (let i = 0; i < currentData.players.length; i++) {
+                                                currentData.players[i].points = 0;
+                                            }
+                                        }
+                                        currentData.timerSetting = "answering";
+                                        currentData.timerEndTime = Date.now() + thirtySecondsInTS / 6;
                                     }
-                                    roomRef.update({
-                                        players: roomRefVal.players,
-                                        timerSetting: "voting",
-                                        timerEndTime: Date.now()+thirtySecondsInTS/6
-                                    })
+                                } else {
+                                    if (currentData.timerEndTime < Date.now()) {
+                                        currentData.timerSetting = "voting";
+                                        currentData.timerEndTime = Date.now() + thirtySecondsInTS / 6;
+                                    }
                                 }
-                            }
-                        },3000)
-                    }else{
-                        handleWaitingRoomHtml()
+                                return currentData;
+                            });
+                        }, 3000);
+                    } else {
+                        handleRoomUpdate(snapshot);
                     }
-                })
+                });
 
-                handleWaitingRoomHtml()
+                /* handleWaitingRoomHtml(); */
         }
         
 
