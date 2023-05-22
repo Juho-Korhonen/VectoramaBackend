@@ -107,19 +107,19 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
 
                         setInterval(() => { //Timer function
                             roomRef.transaction(currentData => {
-                                if (currentData && currentData.timerSetting === "voting") {
+                                if (currentData && currentData.timerSetting === "answering") {
                                     if (currentData.timerEndTime < Date.now()) {
                                         if (currentData.players) {
                                             for (let i = 0; i < currentData.players.length; i++) {
                                                 currentData.players[i].points = 0;
                                             }
                                         }
-                                        currentData.timerSetting = "answering";
+                                        currentData.timerSetting = "voting";
                                         currentData.timerEndTime = Date.now() + thirtySecondsInTS / 6;
                                     }
                                 } else {
                                     if (currentData.timerEndTime < Date.now()) {
-                                        currentData.timerSetting = "voting";
+                                        currentData.timerSetting = "answering";
                                         currentData.timerEndTime = Date.now() + thirtySecondsInTS / 6;
                                     }
                                 }
