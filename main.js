@@ -41,7 +41,7 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
             if(isAdmin){
                 gameContainerElement.innerHTML = getHtml("adminStartView")
                 document.getElementById("gameId").innerHTML = "Room id: " + roomId;
-                document.getElementById("numberOfPlayers").innerHTML = "Number of players: " + Number(roomRefVal.players.length+1)
+                document.getElementById("numberOfPlayers").innerHTML = "Number of players: " + Number(roomRefVal.players.length)
                 document.getElementById("startButton").addEventListener("click", () => {// if the admin presses to start game
                     if(roomRefVal.players.length > -3){
                         gameContainerElement.innerHTML = getHtml("gameView");
@@ -55,7 +55,7 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
             } else {
                 gameContainerElement.innerHTML = getHtml("normalStartView");
                 document.getElementById("gameId").innerHTML = "Room id: " + roomId;
-                document.getElementById("numberOfPlayers").innerHTML = "Number of players: " + Number(roomRefVal.players.length+1);
+                document.getElementById("numberOfPlayers").innerHTML = "Number of players: " + Number(roomRefVal.players.length);
             }
         }
 
