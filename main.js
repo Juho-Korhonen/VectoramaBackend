@@ -37,6 +37,27 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
 
     firebase.auth().onAuthStateChanged(user => {
         function InitWaitingRoom(){
+            function handleWaitingRoomHtml(){
+                if(isAdmin){
+                    gameContainerElement.innerHTML = getHtml("adminStartView")
+                    document.getElementById("gameId").innerHTML = "Room id: " + roomId;
+                    document.getElementById("numberOfPlayers").innerHTML = "Number of players: " + Number(roomRefVal.players.length+1)
+                    document.getElementById("startButton").addEventListener("click", () => {// if the admin presses to start game
+                        if(roomRefVal.players.length > -3){
+                            gameContainerElement.innerHTML = getHtml("gameView");
+                            roomRef.update({
+                                gameStarted: true
+                            })
+                        } else {
+                            alert("Not enough players currently, need atleast 4 players.")
+                        }
+                    })
+                }else {
+                    gameContainerElement.innerHTML = getHtml("normalStartView");
+                    document.getElementById("gameId").innerHTML = "Room id: " + roomId;
+                    document.getElementById("numberOfPlayers").innerHTML = "Number of players: " + Number(roomRefVal.players.length+1);
+                }
+            }
                 roomRef.on("value",snapshot => {// activates when room values change(for updating values and handling disconnects/leaves)
                     roomRefVal = snapshot.val();// resetting roomRefVal on change
                     isAdmin = roomRefVal.adminId == playerId;
@@ -87,7 +108,11 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                                 }
                             } else{
                                 if(roomRefVal.timerEndTime < Date.now()){
+                                    for(var i=0; i<roomRefVal.players.length; i++){
+                                        roomRefVal.players[i].points = 0
+                                    }
                                     roomRef.update({
+                                        players: roomRefVal.players,
                                         timerSetting: "voting",
                                         timerEndTime: Date.now()+thirtySecondsInTS/6
                                     })
@@ -98,27 +123,7 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                         handleWaitingRoomHtml()
                     }
                 })
-                function handleWaitingRoomHtml(){
-                    if(isAdmin){
-                        gameContainerElement.innerHTML = getHtml("adminStartView")
-                        document.getElementById("gameId").innerHTML = "Room id: " + roomId;
-                        document.getElementById("numberOfPlayers").innerHTML = "Number of players: " + Number(roomRefVal.players.length+1)
-                        document.getElementById("startButton").addEventListener("click", () => {// if the admin presses to start game
-                            if(roomRefVal.players.length > -3){
-                                gameContainerElement.innerHTML = getHtml("gameView");
-                                roomRef.update({
-                                    gameStarted: true
-                                })
-                            } else {
-                                alert("Not enough players currently, need atleast 4 players.")
-                            }
-                        })
-                    }else {
-                        gameContainerElement.innerHTML = getHtml("normalStartView");
-                        document.getElementById("gameId").innerHTML = "Room id: " + roomId;
-                        document.getElementById("numberOfPlayers").innerHTML = "Number of players: " + Number(roomRefVal.players.length+1);
-                    }
-                }
+
                 handleWaitingRoomHtml()
         }
         
@@ -142,7 +147,9 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                         players: [{
                             uid: playerId,
                             username: playerName,
+                            points: 10,
                         }],
+
                         gameStarted: false,
                         gameStartTime: Date.now(),
                         timerSetting: 'answering',
