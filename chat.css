@@ -91,7 +91,8 @@
     border-radius: 50%;
   }
   .message-bubble {
-    max-width: 450px;
+    max-width: auto;
+    max-width: 150px;
     padding: 15px;
     border-radius: 15px;
   }

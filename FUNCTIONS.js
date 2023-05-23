@@ -69,7 +69,7 @@ export function getHtml(htmlName){
         </main>
         <!-- Oma vastaus -->
         <form class="messenger-inputarea">
-            <input id="sendMessageInput" maxlength="10" type="text" class="messenger-input" placeholder="Kirjoita vastauksesi...">
+            <input id="sendMessageInput" class="messenger-input" placeholder="Kirjoita vastauksesi...">
             <button id="sendMessageButton" type="button" class="messenger-send-btn" onclick=""><i class="bi bi-send"></i></button>
         </form>
         </section>
