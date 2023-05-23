@@ -33,7 +33,7 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
     var roomRefVal;
     var roomId;
     var isAdmin;// if user is admin/creator
-    var thirtySecondsInTS = 30000;// 30 seconds in time stamp
+    var minuteInTs = 60000;// minute in time stamp
 
     firebase.auth().onAuthStateChanged(user => {
 
@@ -44,7 +44,6 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                 document.getElementById("numberOfPlayers").innerHTML = "Number of players: " + Number(roomRefVal.players.length)
                 document.getElementById("startButton").addEventListener("click", () => {// if the admin presses to start game
                     if(roomRefVal.players.length > -3){
-                        gameContainerElement.innerHTML = getHtml("gameView");
                         roomRef.update({
                             gameStarted: true
                         })
@@ -92,8 +91,6 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                     } 
 
                     if(roomRefVal.gameStarted) {// KEHITSYS JATKUU KEHITSYS JATKUU TÄÄLLÄ KEHITSYS JATKUU TÄÄLLÄ KEHITSYS JATKUU TÄÄLLÄ KEHITSYS JATKUU TÄÄLLÄ KEHITSYS JATKUU TÄÄLLÄ
-                        gameContainerElement.innerHTML = getHtml("gameView");
-
                         if(roomRefVal.AIs[0] == "empty"){// if there is no AIs, we add the right amount of them
                             var numberOfAisWanted = Math.round((roomRefVal.players.length/4)-0.5)
                             handleAiData(numberOfAisWanted == 0 ? 1 : numberOfAisWanted).then(aiData => {
@@ -102,26 +99,43 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                         }
 
                         if(roomRefVal.timerEndTime == "unset"){// if timer hasnt been set, set it
-                            roomRef.update({timerEndTime: Date.now() + thirtySecondsInTS})
+                            roomRef.update({timerEndTime: Date.now() + minuteInTs})
                         }
 
                         setInterval(() => { //Timer function
                             roomRef.transaction(currentData => {
-                                if (currentData && currentData.timerSetting === "answering") {
-                                    if (currentData.timerEndTime < Date.now()) {
+                                if (currentData && currentData.timerSetting === "chat") {
+                                    if(document.getElementById("currentView") !== "chatView"){// if not chatview, set chatview
+                                        gameContainerElement.innerHTML = getHtml("chatView")
+                                    }
+                                    if (currentData.timerEndTime < Date.now()) {// empty players points, timer functionality
                                         if (currentData.players) {
                                             for (let i = 0; i < currentData.players.length; i++) {
                                                 currentData.players[i].points = 0;
-                                            }
+                                            }// setting all users points to 0 for voting time.
                                         }
                                         currentData.timerSetting = "voting";
-                                        currentData.timerEndTime = Date.now() + thirtySecondsInTS;
+                                        currentData.timerEndTime = Date.now() + minuteInTs;
                                     }
+
+                                    function handleChatView(){
+
+                                    }
+                                    handleChatView()
                                 } else {
-                                    if (currentData.timerEndTime < Date.now()) {
-                                        currentData.timerSetting = "answering";
-                                        currentData.timerEndTime = Date.now() + thirtySecondsInTS;
+                                    if(document.getElementById("currentView") !== "votingView"){// if not votingview, set votingview
+                                        gameContainerElement.innerHTML = getHtml("votingView")
                                     }
+                                    if (currentData.timerEndTime < Date.now()) {// timer functionality, reset chat
+                                        currentData.timerSetting = "chat";
+                                        currentData.timerEndTime = Date.now() + minuteInTs;
+                                        roomRef.update({messages: []})
+                                    }
+
+                                    function handleVotingView(){
+
+                                    }
+                                    handleVotingView()
                                 }
                                 return currentData;
                             });
@@ -154,12 +168,12 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                         players: [{
                             uid: playerId,
                             username: playerName,
-                            points: 10,
+                            points: 0,
                         }],
-
+                        messages:["empty"],
                         gameStarted: false,
                         gameStartTime: Date.now(),
-                        timerSetting: 'answering',
+                        timerSetting: 'chat',
                         timerEndTime: "unset"
                     })
                     roomRef.get().then(res => {
