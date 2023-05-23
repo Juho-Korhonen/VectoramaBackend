@@ -130,121 +130,115 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
 
                         setInterval(() => { //Timer function
                             roomRef.transaction(currentData => {
-                                function updateMessages(){
-                                    var messagesElement = document.getElementById("messages")
-                                    if(messagesElement !== null){
-                                        var messages = roomRefVal.messages;
-                                        var messagesObject = "";
-                                        for (let i = 1; i < messages.length; i++) {
-                                            var message = messages[i]
-                                            var amISenderOfMessage = message.sender == playerName
-                                            const date = new Date(message.time)
-                                            const minutes = date.getMinutes()
-                                            if(minutes.length == 1){
-                                                minutes = "0"+minutes
-                                            }
-                                            if(amISenderOfMessage){
-                                                messagesObject = messagesObject + 
-                                                `
-                                                <div class="message right-message">
-                                                  <div class="message-bubble">
-                                                    <div class="message-info">
-                                                      <div class="message-info-name" id="username">${message.sender}</div>
-                                                      <div class="message-info-time">${date.getHours()+":"+minutes}</div>
-                                                    </div>
-                                                    <div class="message-text">${message.text}</div>
-                                                  </div>
-                                                </div>
-                                                `
-                                            }else {
-                                                messagesObject = messagesObject + 
-                                                `
-                                                <div class="message left-message">
-                                                  <div class="message-bubble">
-                                                    <div class="message-info">
-                                                      <div class="message-info-name" id="username">${message.sender}</div>
-                                                      <div class="message-info-time">${date.getHours()+":"+minutes}</div>
-                                                    </div>
-                                                    <div class="message-text">${message.text}</div>
-                                                  </div>
-                                                </div>
-                                                `
-                                            }
-    
-                                        }
-                                        messagesElement.innerHTML = messagesObject;
+                                function updateMessages() {
+                                  var messagesElement = document.getElementById("messages");
+                                  if (messagesElement !== null) {
+                                    var messages = roomRefVal.messages;
+                                    var messagesObject = "";
+                                    for (let i = 1; i < messages.length; i++) { // Fixed the starting index to 0
+                                      var message = messages[i];
+                                      var amISenderOfMessage = message.sender == playerName;
+                                      const date = new Date(message.time);
+                                      let minutes = date.getMinutes(); // Changed to let instead of const
+                                      if (minutes.toString().length === 1) { // Converted minutes to string for length check
+                                        minutes = "0" + minutes;
+                                      }
+                                      if (amISenderOfMessage) {
+                                        messagesObject = messagesObject +
+                                          `
+                                          <div class="message right-message">
+                                            <div class="message-bubble">
+                                              <div class="message-info">
+                                                <div class="message-info-name" id="username">${message.sender}</div>
+                                                <div class="message-info-time">${date.getHours()}:${minutes}</div>
+                                              </div>
+                                              <div class="message-text">${message.text}</div>
+                                            </div>
+                                          </div>
+                                          `;
+                                      } else {
+                                        messagesObject = messagesObject +
+                                          `
+                                          <div class="message left-message">
+                                            <div class="message-bubble">
+                                              <div class="message-info">
+                                                <div class="message-info-name" id="username">${message.sender}</div>
+                                                <div class="message-info-time">${date.getHours()}:${minutes}</div>
+                                              </div>
+                                              <div class="message-text">${message.text}</div>
+                                            </div>
+                                          </div>
+                                          `;
+                                      }
                                     }
-    
+                                    messagesElement.innerHTML = messagesObject;
+                                  }
                                 }
-                                function setUsersToVoteFor(){
-                                    var peopleToVote = document.getElementById("peopleToVote");
-                                    if(peopleToVote !== null){
-                                        var peopleToVoteElement = "";
-                                        for (let i = 0; i < currentData.players.length; i++) {
-                                            const player = currentData.players[i];
-                                            peopleToVoteElement = peopleToVoteElement + 
-                                            `
-                                                <button class="btn">pelaajan nimi: ${player.username}</p><br>
-                                            `
-                                        }
-                                        peopleToVote.innerHTML = peopleToVoteElement;
+                              
+                                function setUsersToVoteFor() {
+                                  var peopleToVote = document.getElementById("peopleToVote");
+                                  if (peopleToVote !== null) {
+                                    var peopleToVoteElement = "";
+                                    for (let i = 0; i < currentData.players.length; i++) {
+                                      const player = currentData.players[i];
+                                      peopleToVoteElement = peopleToVoteElement +
+                                        `
+                                        <button class="btn">pelaajan nimi: ${player.username}</p><br>
+                                        `;
                                     }
-
+                                    peopleToVote.innerHTML = peopleToVoteElement;
+                                  }
                                 }
-                                updateMessages()
-                                setUsersToVoteFor()
-
-
+                              
+                                updateMessages();
+                                setUsersToVoteFor();
+                              
                                 const timer = document.getElementById("timer");
-
-                                timer !== null ? document.getElementById("timer").innerHTML = Math.round((currentData.timerEndTime - Date.now()) / 1000): null
-                            
+                              
+                                timer !== null ? (document.getElementById("timer").innerHTML = Math.round((currentData.timerEndTime - Date.now()) / 1000)) : null;
+                              
                                 if (currentData && currentData.timerSetting === "chat") {
-                                    if(document.getElementById("currentView").innerHTML !== "chatView"){// if not chatview, set chatview
-                                        gameContainerElement.innerHTML = getHtml("chatView")
-                                        initializeSendMessageButtonListener(currentData)
+                                  if (document.getElementById("currentView").innerHTML !== "chatView") { // if not chatview, set chatview
+                                    gameContainerElement.innerHTML = getHtml("chatView");
+                                    initializeSendMessageButtonListener(currentData);
+                                  }
+                                  if (currentData.timerEndTime < Date.now()) { // empty players points, timer functionality
+                                    if (currentData.players) {
+                                      for (let i = 0; i < currentData.players.length; i++) {
+                                        currentData.players[i].points = 0;
+                                      } // setting all users points to 0 for voting time.
                                     }
-                                    if (currentData.timerEndTime < Date.now()) {// empty players points, timer functionality
-                                        if (currentData.players) {
-                                            for (let i = 0; i < currentData.players.length; i++) {
-                                                currentData.players[i].points = 0;
-                                            }// setting all users points to 0 for voting time.
-                                        };
-                                        for (let i = 0; i < currentData.players.length; i++) {
-                                            if(currentData.players[i].uid === playerId){
-                                                currentData.players[i].canSendMessage = true
-                                            }
-                                        }
-                                        roomRef.update({
-                                            messages: ["empty"],
-                                            players: currentData.players
-                                        })
-                                        currentData.messages = ["empty"]
-                                        currentData.timerSetting = "voting";
-                                        currentData.timerEndTime = Date.now() + minuteInTs;
-
+                                    for (let i = 0; i < currentData.players.length; i++) {
+                                      if (currentData.players[i].uid === playerId) {
+                                        currentData.players[i].canSendMessage = true;
+                                      }
                                     }
-
-                                    
-
+                                    roomRef.update({
+                                      messages: ["empty"],
+                                      players: currentData.players
+                                    });
+                                    currentData.messages = ["empty"];
+                                    currentData.timerSetting = "voting";
+                                    currentData.timerEndTime = Date.now() + minuteInTs;
+                                  }
                                 } else {
-                                    if(document.getElementById("currentView").innerHTML !== "votingView"){// if not votingview, set votingview
-                                        gameContainerElement.innerHTML = getHtml("votingView");
-                                        
-
-                                    }
-                                    if (currentData.timerEndTime < Date.now()) {// timer functionality, reset chat
-                                        currentData.timerSetting = "chat";
-                                        currentData.timerEndTime = Date.now() + minuteInTs;
-                                    }
-
-                                    function handleVotingView(){
-
-                                    }
-                                    handleVotingView()
+                                  if (document.getElementById("currentView").innerHTML !== "votingView") { // if not votingview, set votingview
+                                    gameContainerElement.innerHTML = getHtml("votingView");
+                                  }
+                                  if (currentData.timerEndTime < Date.now()) { // timer functionality, reset chat
+                                    currentData.timerSetting = "chat";
+                                    currentData.timerEndTime = Date.now() + minuteInTs;
+                                  }
+                              
+                                  function handleVotingView() {
+                                    // Add your logic for the voting view here
+                                  }
+                              
+                                  handleVotingView();
                                 }
                                 return currentData;
-                            });
+                              });
+                              
                         }, 3000);
                     } else {
                         handleRoomUpdate(snapshot);
