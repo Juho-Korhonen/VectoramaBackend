@@ -14,7 +14,7 @@ export function getHtml(htmlName){
             <h2>You are the admin of the game. this means that you get to decide when the game starts. Click start game to start!</h2>
             <p id="gameId">Game id: 231232</p>
             <p id="numberOfPlayers"></p>
-            <button id="startButton" type="button">Start game</button>
+            <button class="btn" id="startButton" type="button">Start game</button>
         </div>
         `
     } else if (htmlName == "initialView"){
