@@ -71,7 +71,7 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                 if(fieldValue.length > 1){
                     
                     if(currentData.players.find(player => player.uid == playerId).canSendMessage){
-                        currentData.messages.push({
+                        roomRefVal.messages.push({
                             time: Date.now(),
                             sender: playerName,
                             text: fieldValue
@@ -82,7 +82,7 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                             }
                         }
                         roomRef.update({
-                            messages: currentData.messages,
+                            messages: roomRefVal.messages,
                             players: currentData.players
                         })
                     }else alert("Olet lähettänyt jo viestin!")
@@ -128,73 +128,73 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                             roomRef.update({timerEndTime: Date.now() + minuteInTs})
                         }
 
+                        setInterval(()=>{
+                            function updateMessages(){
+                                var messagesElement = document.getElementById("messages")
+                                if(messagesElement !== null){
+                                    var messages = roomRefVal.messages;
+                                    var messagesObject = "";
+                                    for (let i = 1; i < messages.length; i++) {
+                                        var message = messages[i]
+                                        var amISenderOfMessage = message.sender == playerName
+                                        const date = new Date(message.time)
+                                        const minutes = date.getMinutes()
+                                        if(minutes.length == 1){
+                                            minutes = "0"+minutes
+                                        }
+                                        if(amISenderOfMessage){
+                                            messagesObject +=
+                                            `
+                                            <div class="message right-message">
+                                              <div class="message-bubble">
+                                                <div class="message-info">
+                                                  <div class="message-info-name" id="username">${message.sender}</div>
+                                                  <div class="message-info-time">${date.getHours()+":"+minutes}</div>
+                                                </div>
+                                                <div class="message-text">${message.text}</div>
+                                              </div>
+                                            </div>
+                                            `
+                                        }else {
+                                            messagesObject +=
+                                            `
+                                            <div class="message left-message">
+                                              <div class="message-bubble">
+                                                <div class="message-info">
+                                                  <div class="message-info-name" id="username">${message.sender}</div>
+                                                  <div class="message-info-time">${date.getHours()+":"+minutes}</div>
+                                                </div>
+                                                <div class="message-text">${message.text}</div>
+                                              </div>
+                                            </div>
+                                            `
+                                        }
+
+                                    }
+                                    messagesElement.innerHTML = messagesObject;
+                                }
+
+                            }
+                            function setUsersToVoteFor(){
+                                var peopleToVote = document.getElementById("peopleToVote");
+                                if(peopleToVote !== null){
+                                    var peopleToVoteElement = "";
+                                    for (let i = 0; i < currentData.players.length; i++) {
+                                        const player = currentData.players[i];
+                                        peopleToVoteElement = peopleToVoteElement + 
+                                        `
+                                            <button class="btn">pelaajan nimi: ${player.username}</p><br>
+                                        `
+                                    }
+                                    peopleToVote.innerHTML = peopleToVoteElement;
+                                }
+
+                            }
+                            updateMessages()
+                            setUsersToVoteFor()
+                        },2000)
                         setInterval(() => { //Timer function
                             roomRef.transaction(currentData => {
-                                function updateMessages(){
-                                    var messagesElement = document.getElementById("messages")
-                                    if(messagesElement !== null){
-                                        var messages = roomRefVal.messages;
-                                        var messagesObject = "";
-                                        for (let i = 1; i < messages.length; i++) {
-                                            var message = messages[i]
-                                            var amISenderOfMessage = message.sender == playerName
-                                            const date = new Date(message.time)
-                                            const minutes = date.getMinutes()
-                                            if(minutes.length == 1){
-                                                minutes = "0"+minutes
-                                            }
-                                            if(amISenderOfMessage){
-                                                messagesObject +=
-                                                `
-                                                <div class="message right-message">
-                                                  <div class="message-bubble">
-                                                    <div class="message-info">
-                                                      <div class="message-info-name" id="username">${message.sender}</div>
-                                                      <div class="message-info-time">${date.getHours()+":"+minutes}</div>
-                                                    </div>
-                                                    <div class="message-text">${message.text}</div>
-                                                  </div>
-                                                </div>
-                                                `
-                                            }else {
-                                                messagesObject +=
-                                                `
-                                                <div class="message left-message">
-                                                  <div class="message-bubble">
-                                                    <div class="message-info">
-                                                      <div class="message-info-name" id="username">${message.sender}</div>
-                                                      <div class="message-info-time">${date.getHours()+":"+minutes}</div>
-                                                    </div>
-                                                    <div class="message-text">${message.text}</div>
-                                                  </div>
-                                                </div>
-                                                `
-                                            }
-    
-                                        }
-                                        messagesElement.innerHTML = messagesObject;
-                                    }
-    
-                                }
-                                function setUsersToVoteFor(){
-                                    var peopleToVote = document.getElementById("peopleToVote");
-                                    if(peopleToVote !== null){
-                                        var peopleToVoteElement = "";
-                                        for (let i = 0; i < currentData.players.length; i++) {
-                                            const player = currentData.players[i];
-                                            peopleToVoteElement = peopleToVoteElement + 
-                                            `
-                                                <button class="btn">pelaajan nimi: ${player.username}</p><br>
-                                            `
-                                        }
-                                        peopleToVote.innerHTML = peopleToVoteElement;
-                                    }
-
-                                }
-                                updateMessages()
-                                setUsersToVoteFor()
-
-
                                 const timer = document.getElementById("timer");
 
                                 timer !== null ? document.getElementById("timer").innerHTML = Math.round((currentData.timerEndTime - Date.now()) / 1000): null
