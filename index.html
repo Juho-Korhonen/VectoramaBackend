@@ -4,17 +4,28 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand&display=swap" rel="stylesheet">
     <title>Document</title>
     <link rel="stylesheet" href="/styles.css" type="text/css">
 </head>
 <body>
+    <!-- Header -->
+    <div class="header">
+        <h3 class="animated-heading"><b>MIELIHURJAUS</b></h1>
+        <h4><i>IHMINEN VS KONE</i></h2>
+    </div>
+
     <div id="gameContainerElement">
         <div class="container">
-            <button id="createRoomBtn" class="btn" onclick="">Luo huone</button>
+            <h2>Luo Huone</h2>
+            <button id="createRoomBtn" class="btn" onclick="">Luo</button>
         </div>
         <div class="container">
-            <button id="joinRoomBtn" class="btn" onclick="">Liity huoneeseen</button>
-            <input placeholder="huoneen id" id="roomCodeInput" maxlength="10" type="text" />
+            <h2>Liity Huoneeseen</h2>
+            <input placeholder="huoneen id" id="roomCodeInput" maxlength="10" type="text" /><br>
+            <button id="joinRoomBtn" class="btn" onclick="">Liity</button>
         </div>
         <div class="container">
             <input placeholder="username" id="usernameInput" maxlength="10" type="text" />
