@@ -9,11 +9,13 @@ export function generateRandomId(){
 export function getHtml(htmlName){
     if (htmlName == "adminStartView"){
         return `
+        <div class="odotus-room">
             <p id="currentView" style="visibility: hidden">adminStartView</p>
             <h2>You are the admin of the game. this means that you get to decide when the game starts. Click start game to start!</h2>
             <p id="gameId">Game id: 231232</p>
             <p id="numberOfPlayers"></p>
-            <button id="startButton" type="button">Start game</button>
+            <button class="btn" id="startButton" type="button">Start game</button>
+        </div>
         `
     } else if (htmlName == "initialView"){
         return `
@@ -31,9 +33,11 @@ export function getHtml(htmlName){
         `
     } else if(htmlName == "normalStartView"){
         return `
+        <div class="odotus-room">
             <p id="currentView" style="visibility: hidden">normalStartView</p>
             <p id="gameId">Game id: 231232</p>
             <p id="numberOfPlayers"></p>
+        </div>
         `
     } else if (htmlName == "gameView"){
         return `
