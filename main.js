@@ -133,22 +133,35 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                                 var messagesElement = document.getElementById("messages")
                                 if(messagesElement !== null){
                                     var messages = roomRefVal.messages;
-                                    var messagesObject = ""
+                                    var messagesObject = "";
                                     for (let i = 1; i < messages.length; i++) {
+                                        var amISenderOfMessage = message.sender == playerName
                                         var message = messages[i]
                                         const date = new Date(message.time)
                                         const minutes = date.getMinutes()
                                         if(minutes.length == 1){
                                             minutes = "0"+minutes
                                         }
-                                        messagesObject = messagesObject + 
+                                        if(amISenderOfMessage){
+                                            messagesObject = messagesObject + 
                                             `
-                                            <div class="container">
+                                            <div class="message left-message">
                                                 <p>sender: ${message.sender}</p>
                                                 <p>text: ${message.text}</p>
                                                 <p>time: ${date.getHours()+":"+minutes}</p>
                                             </div>
                                             `
+                                        }else {
+                                            messagesObject = messagesObject + 
+                                            `
+                                            <div class="message right-message">
+                                                <p>sender: ${message.sender}</p>
+                                                <p>text: ${message.text}</p>
+                                                <p>time: ${date.getHours()+":"+minutes}</p>
+                                            </div>
+                                            `
+                                        }
+
                                     }
                                     messagesElement.innerHTML = messagesObject;
                                 }
