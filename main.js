@@ -27,6 +27,7 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
     const joinRoomCode = document.getElementById("roomCodeInput");
     const gameContainerElement = document.getElementById("gameContainerElement");
 
+
     var playerId;
     var playerName;
     var roomRef;
@@ -62,6 +63,31 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
             const roomRefVal = snapshot.val();
             const isAdmin = roomRefVal.adminId === playerId;
             handleWaitingRoomHtml(roomRefVal, isAdmin);
+        }
+
+        function initializeSendMessageButtonListener(currentData){
+            document.getElementById("sendMessageButton").addEventListener("click", () => {
+                const fieldValue = document.getElementById("sendMessageInput").value
+                if(fieldValue.length > 1){
+                    
+                    if(currentData.players.find(player => player.uid == playerId).canSendMessage){
+                        currentData.messages.push({
+                            time: Date.now(),
+                            sender: playerName,
+                            text: fieldValue
+                        })
+                        for (let i = 0; i < currentData.players.length; i++) {
+                            if(currentData.players[i].uid === playerId){
+                                currentData.players[i].canSendMessage = false;
+                            }
+                        }
+                        roomRef.update({
+                            messages: currentData.messages,
+                            players: currentData.players
+                        })
+                    }else alert("Olet lähettänyt jo viestin!")
+                }else alert("Liian lyhyt viesti.")
+            })
         }
 
         function InitWaitingRoom() {
@@ -103,10 +129,37 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                         }
 
                         setInterval(() => { //Timer function
+                            function updateMessages(){
+                                var messagesElement = document.getElementById("messages")
+                                if(messagesElement !== null){
+                                    var messages = roomRefVal.messages;
+                                    var messagesObject = ""
+                                    for (let i = 1; i < messages.length; i++) {
+                                        var message = messages[i]
+                                        const date = new Date(message.time)
+                                        const minutes = date.getMinutes()
+                                        if(minutes.length == 1){
+                                            minutes = "0"+minutes
+                                        }
+                                        messagesObject = messagesObject + 
+                                            `
+                                            <div class="container">
+                                                <p>sender: ${message.sender}</p>
+                                                <p>text: ${message.text}</p>
+                                                <p>time: ${date.getHours()+":"+minutes}</p>
+                                            </div>
+                                            `
+                                    }
+                                    messagesElement.innerHTML = messagesObject;
+                                }
+
+                            }
+                            updateMessages()
                             roomRef.transaction(currentData => {
                                 if (currentData && currentData.timerSetting === "chat") {
                                     if(document.getElementById("currentView").innerHTML !== "chatView"){// if not chatview, set chatview
                                         gameContainerElement.innerHTML = getHtml("chatView")
+                                        initializeSendMessageButtonListener(currentData)
                                     }
                                     if (currentData.timerEndTime < Date.now()) {// empty players points, timer functionality
                                         if (currentData.players) {
@@ -120,37 +173,18 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                                             }
                                         }
                                         roomRef.update({
-                                            messages: ["moro"],
+                                            messages: ["empty"],
                                             players: currentData.players
                                         })
+                                        currentData.messages = ["empty"]
                                         currentData.timerSetting = "voting";
                                         currentData.timerEndTime = Date.now() + minuteInTs;
 
                                     }
                                     document.getElementById("timer").innerHTML = Math.round((currentData.timerEndTime - Date.now()) / 1000)
-                                    document.getElementById("sendMessageButton").addEventListener("click", () => {
-                                        const fieldValue = document.getElementById("sendMessageInput").value
-                                        if(fieldValue.length > 1){
-                                            const asdwa = currentData.players.find(player => player.uid == playerId).canSendMessage;
-                                            if(asdwa){
-                                                currentData.messages.push({
-                                                    time: Date.now(),
-                                                    sender: playerName,
-                                                    text: fieldValue
-                                                })
-                                                for (let i = 0; i < currentData.players.length; i++) {
-                                                    if(currentData.players[i].uid === playerId){
-                                                        currentData.players[i].canSendMessage = false;
-                                                    }
-                                                }
-                                                console.log("CURMES")
-                                                roomRef.update({
-                                                    messages: currentData.messages,
-                                                    players: currentData.players
-                                                })
-                                            }else alert("Olet lähettänyt jo viestin!")
-                                        }else alert("Liian lyhyt viesti.")
-                                    })
+
+                                    
+
                                 } else {
                                     if(document.getElementById("currentView").innerHTML !== "votingView"){// if not votingview, set votingview
                                         gameContainerElement.innerHTML = getHtml("votingView")

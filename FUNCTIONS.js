@@ -61,6 +61,7 @@ export function getHtml(htmlName){
                 <div class="container">
                     <button id="sendMessageButton" class="btn" onclick="">Lähetä viesti</button>
                     <input placeholder="viestin sisältö" id="sendMessageInput" maxlength="10" type="text" />
+                    <div id="messages"></div>
                     <p id="timer"></p>
                 </div>
             </div>
