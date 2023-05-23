@@ -65,19 +65,6 @@ export function getHtml(htmlName){
         </div>
         <!-- Start of the Messages -->
         <main class="messenger-chat">
-            <!-- First Left Message AI -->
-            <div class="message left-message">
-                <div class="message-bubble">
-                    <div class="message-info">
-                        <div class="message-info-name" id="ai_username"></div>
-                        <div class="message-info-time">00:00</div>
-                    </div>
-                    <!-- id="response" että AI ymmärtää sinne sen laittaa -->
-                    <div class="message-text" id="response1" >
-                    </div>
-                </div>
-            </div>
-            <!-- First Right Message Player -->
             <div id="messages"></div>
         </main>
         <!-- Oma vastaus -->
