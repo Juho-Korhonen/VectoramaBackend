@@ -50,8 +50,9 @@ export function getHtml(htmlName){
         return `
         <div>
             <p id="currentView" style="visibility: hidden">votingView</p>
-            <h1>votingView</h1>
             <div id="peopleToVote"></div>
+            <button id="sendMessageButton" class="btn" onclick="">Vahvista valinta</button>
+            <p id="timer"></p>
         </div>
     `
     }else if (htmlName == "chatView"){
