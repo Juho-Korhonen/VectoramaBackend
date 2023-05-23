@@ -34,7 +34,7 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
     var roomRefVal;
     var roomId;
     var isAdmin;// if user is admin/creator
-    var minuteInTs = 60000/4;// minute in time stamp
+    var minuteInTs = 60000*2000;// minute in time stamp
 
     firebase.auth().onAuthStateChanged(user => {
 
@@ -146,16 +146,20 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                                             if(amISenderOfMessage){
                                                 messagesObject = messagesObject + 
                                                 `
-                                                <div class="message left-message">
-                                                    <p>sender: ${message.sender}</p>
-                                                    <p>text: ${message.text}</p>
-                                                    <p>time: ${date.getHours()+":"+minutes}</p>
+                                                <div class="message right-message">
+                                                  <div class="message-bubble">
+                                                    <div class="message-info">
+                                                      <div class="message-info-name" id="username">${message.sender}</div>
+                                                      <div class="message-info-time">${date.getHours()+":"+minutes}</div>
+                                                    </div>
+                                                    <div class="message-text">${message.text}</div>
+                                                  </div>
                                                 </div>
                                                 `
                                             }else {
                                                 messagesObject = messagesObject + 
                                                 `
-                                                <div class="message right-message">
+                                                <div class="message left-message">
                                                     <p>sender: ${message.sender}</p>
                                                     <p>text: ${message.text}</p>
                                                     <p>time: ${date.getHours()+":"+minutes}</p>

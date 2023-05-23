@@ -33,10 +33,10 @@
     display: flex;
     flex-flow: column wrap;
     justify-content: space-between;
-    width: 100%;
+    width: 1250px;
     max-width: 1250px;
     margin: 25px 10px;
-    height: calc(100% - 100px);
+    height: calc(850px - 100px);
     border: var(--border);
     border-radius: 5px;
     background: var(--msger-bg);
@@ -322,13 +322,15 @@
         max-height: 580px;
     }
     .messenger {
-        margin-top: 43%;
-        height: 650px;
+        margin-top: 20%;
+        height: 700px;
+        max-width: 350px;
+        left: 0px;
     }
     .header {
         width: 98%;
         height: 60px;
-        top: 10%;
+        top: 4%;
     }
     .header h3 {
         font-size: 24px;

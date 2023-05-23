@@ -57,16 +57,16 @@ export function getHtml(htmlName){
     `
     }else if (htmlName == "chatView"){
         return `
+        <p id="currentView" style="visibility: hidden">chatView</p>
         <section class="messenger">
         <div class="messenger-header">
-            <h1 style="position: relative;" id="kysymys">Kysymyksiä Firebasesta</h1><br>
+            <h1 style="position: relative;" id="kysymys">Kysymyksiä Firebasesta</h1><br><br>
             <p id="timer"></p>
         </div>
         <!-- Start of the Messages -->
         <main class="messenger-chat">
             <!-- First Left Message AI -->
             <div class="message left-message">
-                <div class="message-img" style="background-image: url(https://cdn-icons-png.flaticon.com/512/773/773330.png);"></div>
                 <div class="message-bubble">
                     <div class="message-info">
                         <div class="message-info-name" id="ai_username"></div>
@@ -78,18 +78,7 @@ export function getHtml(htmlName){
                 </div>
             </div>
             <!-- First Right Message Player -->
-            <div class="message right-message">
-                <div class="message-img" style="background-image: url(https://freesvg.org/img/abstract-user-flat-4.png);"></div>
-                <div class="message-bubble">
-                    <div class="message-info">
-                        <div class="message-info-name" id="username"></div>
-                        <div class="message-info-time">00:00</div>
-                    </div>
-                    <div class="message-text">
-                        >Oma Vastaus<
-                    </div>
-                </div>
-            </div>
+            <div id="messages"></div>
         </main>
         <!-- Oma vastaus -->
         <form class="messenger-inputarea">
@@ -97,15 +86,6 @@ export function getHtml(htmlName){
             <button id="sendMessageButton" type="button" class="messenger-send-btn" onclick=""><i class="bi bi-send"></i></button>
         </form>
         </section>
-            <div>
-                <p id="currentView" style="visibility: hidden">chatView</p>
-                <div class="container">
-                    <button id="sendMessageButton" class="btn" onclick="">Lähetä viesti</button>
-                    <input placeholder="viestin sisältö" id="sendMessageInput" maxlength="10" type="text" />
-                    <div id="messages"></div>
-                    <p id="timer"></p>
-                </div>
-            </div>
         `
     }
 }
