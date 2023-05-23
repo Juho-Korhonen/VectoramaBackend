@@ -303,9 +303,11 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                         const userInGame = oldRoomRef.players.find(player => player.uid == playerId) !== undefined;
                         if(!userInGame){
                             oldRoomRef.players.push({
-                                uid: playerId, 
+                                uid: playerId,
                                 username: playerName,
-                                points: 0
+                                points: 0,
+                                canSendMessage: true,
+                                canVote: true
                             });
                             roomRef.update(oldRoomRef)
                         }
