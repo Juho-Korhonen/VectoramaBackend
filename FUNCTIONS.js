@@ -51,7 +51,7 @@ export function getHtml(htmlName){
         <div>
             <p id="currentView" style="visibility: hidden">votingView</p>
             <div id="peopleToVote"></div>
-            <button id="sendMessageButton" class="btn" onclick="">Vahvista valinta</button>
+            <button id="acceptVote" class="btn" onclick="">Vahvista valinta</button>
             <p id="timer"></p>
         </div>
     `

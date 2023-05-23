@@ -182,11 +182,13 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                             if(peopleToVote !== null){
                                 var peopleToVoteElement = "";
                                 for (let i = 0; i < currentData.players.length; i++) {
-                                    const player = currentData.players[i];
-                                    peopleToVoteElement = peopleToVoteElement + 
-                                    `
-                                        <button class="btn">pelaajan nimi: ${player.username}</p><br>
-                                    `
+                                    if(currentData.players[i].uid !== playerId){
+                                        const player = currentData.players[i];
+                                        peopleToVoteElement = peopleToVoteElement + 
+                                        `
+                                            <button class="btn">pelaajan nimi: ${player.username}</p><br>
+                                        `
+                                    }
                                 }
                                 peopleToVote.innerHTML = peopleToVoteElement;
                             }
