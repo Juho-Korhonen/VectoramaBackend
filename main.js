@@ -19,6 +19,9 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
     }
 }
 
+/* Errors */
+/* Input -> Enter menee etusivulle, css chatbox menee ylitse kun kirjoittaa paljon
+/* ------ */
 
 
 (function(){
@@ -34,7 +37,7 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
     var roomRefVal;
     var roomId;
     var isAdmin;// if user is admin/creator
-    var minuteInTs = 60000;// minute in time stamp
+    var minuteInTs = 60000/3;// minute in time stamp
 
     firebase.auth().onAuthStateChanged(user => {
 
@@ -127,6 +130,7 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                         if(roomRefVal.timerEndTime == "unset"){// if timer hasnt been set, set it
                             roomRef.update({timerEndTime: Date.now() + minuteInTs})
                         }
+
                         function updateMessages(){
                             var messagesElement = document.getElementById("messages")
                             if(messagesElement !== null){
@@ -146,7 +150,7 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                                         <div class="message right-message">
                                           <div class="message-bubble">
                                             <div class="message-info">
-                                              <div class="message-info-name" id="username">${message.sender}</div>
+                                              <div class="message-info-name">${message.sender}</div>
                                               <div class="message-info-time">${date.getHours()+":"+minutes}</div>
                                             </div>
                                             <div class="message-text">${message.text}</div>
@@ -159,7 +163,7 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                                         <div class="message left-message">
                                           <div class="message-bubble">
                                             <div class="message-info">
-                                              <div class="message-info-name" id="username">${message.sender}</div>
+                                              <div class="message-info-name">${message.sender}</div>
                                               <div class="message-info-time">${date.getHours()+":"+minutes}</div>
                                             </div>
                                             <div class="message-text">${message.text}</div>
@@ -171,8 +175,8 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                                 }
                                 messagesElement.innerHTML = messagesObject;
                             }
-
                         }
+
                         function setUsersToVoteFor(currentData){
                             var peopleToVote = document.getElementById("peopleToVote");
                             if(peopleToVote !== null){
@@ -186,8 +190,8 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                                 }
                                 peopleToVote.innerHTML = peopleToVoteElement;
                             }
-
                         }
+
                         setInterval(() => { //Timer function
                             roomRef.transaction(currentData => {
                                 updateMessages()
@@ -222,24 +226,14 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                                         currentData.timerEndTime = Date.now() + minuteInTs;
 
                                     }
-
-                                    
-
                                 } else {
                                     if(document.getElementById("currentView").innerHTML !== "votingView"){// if not votingview, set votingview
                                         gameContainerElement.innerHTML = getHtml("votingView");
-                                        
-
                                     }
                                     if (currentData.timerEndTime < Date.now()) {// timer functionality, reset chat
                                         currentData.timerSetting = "chat";
                                         currentData.timerEndTime = Date.now() + minuteInTs;
                                     }
-
-                                    function handleVotingView(){
-
-                                    }
-                                    handleVotingView()
                                 }
                                 return currentData;
                             });
