@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        var playerToVote
+        var players = ["Petri dish","Petri dish2"];
+        var submitted = false;
+
+        function voteForPlayer(playerId){
+            playerToVote = playerId;
+            for(var i=0;i<players.length; i++){
+                if(players[i] == playerId){
+                    document.getElementById(players[i]).style.backgroundColor = "lightblue";
+                }else{
+                    document.getElementById(players[i]).style.backgroundColor = "lightgrey";
+                }
+            }
+
+            
+        }
+        function submit(){
+            if(playerToVote !== undefined){
+                alert("You boted for" + playerToVote)
+            }else{
+                if(confirm("Are you sure to proceed withouthh voting")){
+                    alert("You didnt vote")
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="voteContainer">
+        <button id="Petri dish" onclick="voteForPlayer('Petri dish')">Petri dish</button>
+        <button id="Petri dish2" onclick="voteForPlayer('Petri dish2')">Petri dish2</button><br>
+        <button onclick="submit()" id="submit">submit</button>
+    </div>
+</body>
+</html>

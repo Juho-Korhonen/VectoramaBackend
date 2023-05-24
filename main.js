@@ -30,6 +30,7 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
     const joinRoomCode = document.getElementById("roomCodeInput");
     const gameContainerElement = document.getElementById("gameContainerElement");
 
+    var submitBtnEventListenerAdded = false;
 
     var playerId;
     var playerName;
@@ -37,7 +38,7 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
     var roomRefVal;
     var roomId;
     var isAdmin;// if user is admin/creator
-    var minuteInTs = 60000*3;// minute in time stamp
+    var minuteInTs = 60000/4;// minute in time stamp
 
     firebase.auth().onAuthStateChanged(user => {
 
@@ -177,22 +178,11 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                             }
                         }
 
-                        function setUsersToVoteFor(currentData){
-                            var peopleToVote = document.getElementById("peopleToVote");
-                            if(peopleToVote !== null){
-                                var peopleToVoteElement = "";
-                                for (let i = 0; i < currentData.players.length; i++) {
-                                    if(currentData.players[i].uid !== playerId){
-                                        const player = currentData.players[i];
-                                        peopleToVoteElement = peopleToVoteElement + 
-                                        `
-                                            <button class="btn">pelaajan nimi: ${player.username}</p><br>
-                                        `
-                                    }
-                                }
-                                peopleToVote.innerHTML = peopleToVoteElement;
-                            }
+                        function setUsersToVoteFor(currentData) {
+                            
+
                         }
+                        
 
                         setInterval(() => { //Timer function
                             roomRef.transaction(currentData => {

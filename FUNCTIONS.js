@@ -49,9 +49,10 @@ export function getHtml(htmlName){
     }else if (htmlName == "votingView"){
         return `
         <div>
+            <div id="votingView"></div>
+            <button id="votingViewSubmitBtn" class="btn">SUBMIT</button>
+
             <p id="currentView" style="visibility: hidden">votingView</p>
-            <div id="peopleToVote"></div>
-            <button id="acceptVote" class="btn" onclick="">Vahvista valinta</button>
             <p id="timer"></p>
         </div>
     `
