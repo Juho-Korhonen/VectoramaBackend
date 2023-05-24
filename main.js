@@ -41,7 +41,6 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
     var minuteInTs = 60000/4;// minute in time stamp
 
     firebase.auth().onAuthStateChanged(user => {
-
         function handleWaitingRoomHtml(roomRefVal, isAdmin) {
             if(isAdmin){
                 gameContainerElement.innerHTML = getHtml("adminStartView")
@@ -179,8 +178,21 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                         }
 
                         function setUsersToVoteFor(currentData) {
-                            
+                            var choseUser = "";
+                            var usersElement = "<div class='container'>";
+                            var changeableUsersElement = document.getElementById("votingView")
 
+                            for(var i=0; i<currentData.players.length; i++){
+                                if(currentData.players[i].uid !== playerId){
+                                    usersElement += `<button id="${currentData.players[i].uid}" class="btn">${currentData.players[i].username}</button>`;
+                                    document.getElementById(currentData.players[i].uid) !== null ? document.getElementById(currentData.players[i].uid).addEventListener("click", () => {
+                                        console.log(currentData.players[i].uid)
+                                    }) : null
+                                }
+                            }
+
+                            usersElement += "</div>"
+                            changeableUsersElement !== null ? changeableUsersElement.innerHTML = usersElement : null;
                         }
                         
 
