@@ -60,8 +60,8 @@ export function getHtml(htmlName){
         <p id="currentView" style="visibility: hidden">chatView</p>
         <section class="messenger">
         <div class="messenger-header">
-            <h1 style="position: relative;" id="kysymys">Kysymyksiä Firebasesta</h1><br><br>
-            <p id="timer"></p>
+            <h1 style="position: relative;" id="kysymys">Kysymyksiä Firebasesta</h1>
+            <h3 id="timer">Ajastin:</h3>
         </div>
         <!-- Start of the Messages -->
         <main class="messenger-chat">

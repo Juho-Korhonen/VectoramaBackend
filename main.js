@@ -37,7 +37,7 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
     var roomRefVal;
     var roomId;
     var isAdmin;// if user is admin/creator
-    var minuteInTs = 60000/3;// minute in time stamp
+    var minuteInTs = 60000*3;// minute in time stamp
 
     firebase.auth().onAuthStateChanged(user => {
 

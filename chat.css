@@ -1,6 +1,7 @@
 :root {
     --body-bg: linear-gradient(135deg, #F5F7FA 0%, #c3CFE2 100%);
     --msger-bg: #FFF;
+    --msger-bg: url('images/chatroom-bg.jpg');
     --border: 2px solid #DDD;
     --left-msg-bg: #ECECEC;
     --right-msg-bg: #579FFB;
@@ -46,6 +47,7 @@
 /* Message Header */
   .messenger-header {
     display: flex;
+    flex-direction: column;
     position: relative;
     justify-content: center;
     text-align: center;
@@ -145,7 +147,6 @@
 .messenger-input {
     flex: 1;
     background: #ffffff;
-    margin-top: 5px;
 }
 .messenger-send-btn {
     height: 40px;
