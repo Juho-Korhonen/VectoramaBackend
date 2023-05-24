@@ -19,7 +19,7 @@ h2 {
     margin-top: 0;
 }
 
-.header {
+.header, .header-2 {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -36,12 +36,12 @@ h2 {
     flex-direction: column;
 }
 
-.header h3 {
+.header h3, .header-2 h3 {
     font-size: 52px;
     margin-bottom: 0;
 }
 
-.header h4 {
+.header h4, .header-2 h4 {
     font-size: 30px;
     margin-top: 0;
 }
@@ -145,14 +145,15 @@ input[type="number"] {
     .btn {
         margin: 10px;
     }
-    .header {
-      height: 12%;
-      width: 350px;
+    .header, .header-2 {
+        width: 98%;
+        height: 80px;
+        top: 8%;
     }
-    .header h3 {
+    .header h3, .header-2 h3 {
       font-size: 34px;
     }
-    .header h4 {
+    .header h4, .header-2 h4 {
       font-size: 26px;
     }
     .odotus-room {
