@@ -37,15 +37,15 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
     var roomRefVal;
     var roomId;
     var isAdmin;// if user is admin/creator
-    var minuteInTs = 60000*3;// minute in time stamp
+    var minuteInTs = 60000/2;// minute in time stamp
 
     firebase.auth().onAuthStateChanged(user => {
 
         function handleWaitingRoomHtml(roomRefVal, isAdmin) {
             if(isAdmin){
                 gameContainerElement.innerHTML = getHtml("adminStartView")
-                document.getElementById("gameId").innerHTML = "Room id: " + roomId;
-                document.getElementById("numberOfPlayers").innerHTML = "Number of players: " + Number(roomRefVal.players.length)
+                document.getElementById("gameId").innerHTML = "Huoneen Koodi: " + roomId;
+                document.getElementById("numberOfPlayers").innerHTML = "Pelaajienmäärä: " + Number(roomRefVal.players.length)
                 document.getElementById("startButton").addEventListener("click", () => {// if the admin presses to start game
                     if(roomRefVal.players.length > -3){
                         roomRef.update({
@@ -57,8 +57,8 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                 })
             } else {
                 gameContainerElement.innerHTML = getHtml("normalStartView");
-                document.getElementById("gameId").innerHTML = "Room id: " + roomId;
-                document.getElementById("numberOfPlayers").innerHTML = "Number of players: " + Number(roomRefVal.players.length);
+                document.getElementById("gameId").innerHTML = "Huoneen Koodi: " + roomId;
+                document.getElementById("numberOfPlayers").innerHTML = "Pelaajienmäärä: " + Number(roomRefVal.players.length);
             }
         }
 

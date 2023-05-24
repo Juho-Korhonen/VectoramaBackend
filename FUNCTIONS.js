@@ -11,10 +11,10 @@ export function getHtml(htmlName){
         return `
         <div class="odotus-room">
             <p id="currentView" style="visibility: hidden">adminStartView</p>
-            <h2>You are the admin of the game. this means that you get to decide when the game starts. Click start game to start!</h2>
-            <p id="gameId">Game id: 231232</p>
-            <p id="numberOfPlayers"></p>
-            <button class="btn" id="startButton" type="button">Start game</button>
+            <h2>Olet pelin Admin. tämä tarkoittaa, että saat päättää, milloin peli alkaa. Aloita peli napsauttamalla 'Aloita Peli'!</h2>
+            <h3 id="gameId"></</h3>
+            <h3 id="numberOfPlayers"></h3>
+            <button class="btn" id="startButton" type="button">Aloita Peli</button>
         </div>
         `
     } else if (htmlName == "initialView"){
@@ -35,7 +35,8 @@ export function getHtml(htmlName){
         return `
         <div class="odotus-room">
             <p id="currentView" style="visibility: hidden">normalStartView</p>
-            <p id="gameId">Game id: 231232</p>
+            <h2>Tervetuloa odotushuoneeseen, odotathan rauhallisesti että huoneen Admin aloittaa pelin!</h2>
+            <p id="gameId"></p>
             <p id="numberOfPlayers"></p>
         </div>
         `
