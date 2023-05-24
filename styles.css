@@ -145,15 +145,15 @@ input[type="number"] {
     .btn {
         margin: 10px;
     }
-    .header, .header-2 {
+    .header {
         width: 98%;
         height: 80px;
         top: 8%;
     }
-    .header h3, .header-2 h3 {
+    .header h3 {
       font-size: 34px;
     }
-    .header h4, .header-2 h4 {
+    .header h4 {
       font-size: 26px;
     }
     .odotus-room {
