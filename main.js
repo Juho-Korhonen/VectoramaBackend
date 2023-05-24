@@ -177,38 +177,57 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                             }
                         }
 
-                        function setUsersToVoteFor(currentData) {
-                            var choseUser = "";
+                        function createUserElements(currentData) {
                             var usersElement = "<div class='container'>";
-                            var changeableUsersElement = document.getElementById("votingView")
-
-                            for(var i=0; i<currentData.players.length; i++){
-                                if(currentData.players[i].uid !== playerId){
+                        
+                            for (var i = 0; i < currentData.players.length; i++) {
+                                if (currentData.players[i].uid !== playerId) {
                                     usersElement += `<button id="${currentData.players[i].uid}" class="btn">${currentData.players[i].username}</button>`;
-                                    document.getElementById(currentData.players[i].uid) !== null ? document.getElementById(currentData.players[i].uid).addEventListener("click", () => {
-                                        console.log(currentData.players[i].uid)
-                                    }) : null
                                 }
                             }
-
+                        
                             usersElement += "</div>"
-                            changeableUsersElement !== null ? changeableUsersElement.innerHTML = usersElement : null;
+                            return usersElement;
+                        }
+
+                        function attachEventListeners(currentData) {
+                            for (var i = 0; i < currentData.players.length; i++) {
+                                if (currentData.players[i].uid !== playerId) {
+                                    const button = document.getElementById(currentData.players[i].uid);
+                                    if (button !== null) {
+                                        button.addEventListener("click", () => {
+                                            console.log(currentData.players[i].uid);
+                                        });
+                                    }
+                                }
+                            }
+                        }
+
+                        function setUsersToVoteFor(currentData) {
+                            var changeableUsersElement = document.getElementById("votingView");
+                            const usersElement = createUserElements(currentData);
+                        
+                            if (changeableUsersElement !== null) {
+                                changeableUsersElement.innerHTML = usersElement;
+                                attachEventListeners(currentData);
+                            }
                         }
                         
+                        let votingViewRendered = false;
 
                         setInterval(() => { //Timer function
                             roomRef.transaction(currentData => {
                                 updateMessages()
-                                setUsersToVoteFor(currentData)
 
                                 const timer = document.getElementById("timer");
 
                                 timer !== null ? document.getElementById("timer").innerHTML = Math.round((currentData.timerEndTime - Date.now()) / 1000): null
                             
                                 if (currentData && currentData.timerSetting === "chat") {
-                                    if(document.getElementById("currentView").innerHTML !== "chatView"){// if not chatview, set chatview
+                                    if(document.getElementById("currentView").innerHTML !== "chatView") {// if not chatview, set chatview
                                         gameContainerElement.innerHTML = getHtml("chatView")
                                         initializeSendMessageButtonListener(currentData)
+                                        votingViewRendered = false;
                                     }
                                     if (currentData.timerEndTime < Date.now()) {// empty players points, timer functionality
                                         if (currentData.players) {
@@ -233,6 +252,8 @@ function validateUserName(fetching=false){// if fetching, return field value, ot
                                 } else {
                                     if(document.getElementById("currentView").innerHTML !== "votingView"){// if not votingview, set votingview
                                         gameContainerElement.innerHTML = getHtml("votingView");
+                                        votingViewRendered = true;
+                                        setUsersToVoteFor(currentData)
                                     }
                                     if (currentData.timerEndTime < Date.now()) {// timer functionality, reset chat
                                         currentData.timerSetting = "chat";
